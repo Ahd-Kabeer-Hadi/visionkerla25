@@ -27,7 +27,7 @@ model Driver {
   aadhaarCardNumber    String       @unique
   driversLicenseNumber String       @unique
   rcNumber             String       @unique
-  tncAccepted Boolean
+  tncAccepted          Boolean
   status               DriverStatus
   createdAt            DateTime     @default(now())
 }

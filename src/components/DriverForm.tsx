@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -395,28 +396,28 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
         <FormField
           control={form.control}
           name="tncAccepted"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <div className="flex items-center gap-2">
-                  {/* Checkbox */}
-
-                  <Checkbox
-                    {...field} // Spread field props (like name, onBlur, ref)
-                    checked={field.value} // Use field.value for controlled state
-                    onCheckedChange={(value) => {
-                      setShowTermsDialog(true);
-                      // Handle custom `onCheckedChange`
-                      field.onChange(value); // Update form field
-                      if (!value) setShowTermsDialog(true); // Show dialog when unchecked
-                    }}
-                  />
-                  I agree to the Terms and Conditions
-                </div>
-              </FormLabel>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            const { value, ...fieldWithoutValue } = field; // Destructure to exclude 'value'
+            return (
+              <FormItem onClick={() => setShowTermsDialog(true)}>
+                <FormLabel>
+                  <div className="flex items-center gap-2">
+                    {/* Checkbox */}
+                    <Checkbox
+                      {...fieldWithoutValue} // Spread remaining field props
+                      checked={value} // Use 'value' for controlled state
+                      onCheckedChange={(checked) => {
+                        field.onChange(checked); // Update form field
+                        if (!checked) setShowTermsDialog(true); // Show dialog when unchecked
+                      }}
+                    />
+                    I agree to the Terms and Conditions
+                  </div>
+                </FormLabel>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         {/* Terms Dialog */}

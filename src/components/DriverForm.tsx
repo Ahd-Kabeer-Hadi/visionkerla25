@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -96,53 +97,58 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
       if (mode === "UPDATE") {
         if (!userId) {
           toast("Missing User ID", {
-            description: "User ID is required to update the driver details. Please try again.",
+            description:
+              "User ID is required to update the driver details. Please try again.",
           });
           return;
         }
-  
+
         const result = await updateDriver(userId, data);
         console.log(result);
-  
-        if (result.id) {
+
+        if (result.success) {
           toast("Update Successful", {
             description: "Driver details have been updated successfully.",
           });
         } else {
           toast("Update Failed", {
-            description: "Unable to update driver details. Please check the information and try again.",
+            description:
+              "Unable to update driver details. Please check the information and try again.",
           });
         }
         return;
       }
-  
+
       if (!acceptedTerms) {
         toast("Terms and Conditions Not Accepted", {
-          description: "Please accept the terms and conditions before submitting the form.",
+          description:
+            "Please accept the terms and conditions before submitting the form.",
         });
         return;
       }
-  
+
       // Handle "CREATE" mode
       const result = await submitDriver(data);
-  
+
       if (result.success) {
         toast("Submission Successful", {
-          description: "Your application has been submitted successfully. We will review it shortly.",
+          description:
+            "Your application has been submitted successfully. We will review it shortly.",
         });
       } else {
         toast("Submission Failed", {
-          description: result.message || "An error occurred while submitting your application. Please try again.",
+          description:
+            "An error occurred while submitting your application. Please try again.",
         });
       }
     } catch (error) {
       toast("Unexpected Error", {
-        description: "An unexpected error occurred. Please try again later or contact support if the issue persists.",
+        description:
+          "An unexpected error occurred. Please try again later or contact support if the issue persists.",
       });
       console.error("Error in onSubmit:", error);
     }
   };
-  
 
   return (
     <Form {...form}>
@@ -393,7 +399,8 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
             <FormItem>
               <FormLabel>
                 <div className="flex items-center gap-2">
-                  
+                  {/* Checkbox */}
+
                   <Checkbox
                     {...field} // Spread field props (like name, onBlur, ref)
                     checked={field.value} // Use field.value for controlled state
@@ -439,7 +446,9 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
 
         {/* Submit Button */}
         <Button type="submit" className="w-full">
-          {mode === "CREATE" ? "Submit Registration" : "Update Delivery Partner Details"} 
+          {mode === "CREATE"
+            ? "Submit Registration"
+            : "Update Delivery Partner Details"}
         </Button>
       </form>
     </Form>

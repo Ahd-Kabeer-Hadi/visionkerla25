@@ -24,9 +24,9 @@ model Driver {
   address              String
   district             String
   panchayat            String       @unique
-  aadhaarCardNumber    String       @unique
-  driversLicenseNumber String       @unique
-  rcNumber             String       @unique
+  aadhaarCardNumber    String       
+  driversLicenseNumber String       
+  rcNumber             String       
   tncAccepted          Boolean
   status               DriverStatus
   createdAt            DateTime     @default(now())

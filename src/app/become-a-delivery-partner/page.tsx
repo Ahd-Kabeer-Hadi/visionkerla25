@@ -22,9 +22,7 @@ export default function BecomeADeliveryPartner() {
         </section>
         <DriverForm mode="CREATE" />
       </main>
-      <footer className="text-xs text-gray-500 text-center row-start-3">
-        © {new Date().getFullYear()} Ntouch Syndicate LLP. All rights reserved.
-      </footer>
+      
     </div>
   );
 }

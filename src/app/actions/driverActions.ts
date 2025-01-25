@@ -2,7 +2,11 @@
 "use server";
 
 import { PrismaClient } from "@prisma/client";
-import { DriverFilterSchema, DriverSchema } from "@/lib/validation/driver";
+import {
+  Driver,
+  DriverFilterSchema,
+  DriverSchema,
+} from "@/lib/validation/driver";
 import { z } from "zod";
 
 const prisma = new PrismaClient();
@@ -43,6 +47,9 @@ export async function submitDriver(data: z.infer<typeof DriverSchema>) {
         status: "REVIEWING", // Default status for new drivers
       },
     });
+    if (!newDriver) {
+      throw new Error("OOps! Something went wrong. Please contact Support.");
+    }
 
     return { success: true, driver: newDriver };
   } catch (error: unknown) {
@@ -51,19 +58,26 @@ export async function submitDriver(data: z.infer<typeof DriverSchema>) {
 }
 
 // Fetch a driver by ID
-export async function getDriverById(id: string) {
+export async function getDriverById(
+  id: string
+): Promise<
+  { success: true; driver: Driver } | { success: false; error: string }
+> {
   try {
-    const driver = await prisma.driver.findUnique({
+    const driver = await prisma.driver.findFirst({
       where: { id },
     });
 
     if (!driver) {
       throw new Error("Driver not found.");
     }
-
+   
     return { success: true, driver };
   } catch (error: unknown) {
-    return formatError(error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
 

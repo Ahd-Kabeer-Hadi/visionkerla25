@@ -38,6 +38,7 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { Checkbox } from "./ui/checkbox";
+import { redirect, useRouter } from "next/navigation";
 
 interface DriverFormProps {
   mode: "CREATE" | "UPDATE";
@@ -66,6 +67,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
     },
   });
 
+  const router = useRouter();
   const [panchayatOptions, setPanchayatOptions] = useState<string[]>([]);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -105,7 +107,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
         }
 
         const result = await updateDriver(userId, data);
-        console.log(result);
+        result;
 
         if (result.success) {
           toast("Update Successful", {
@@ -136,7 +138,13 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
           description:
             "Your application has been submitted successfully. We will review it shortly.",
         });
-      } else {
+        form.reset();
+        if (result.success && "driver" in result && result.driver) {
+          router.push(
+            `/become-a-delivery-partner/thank-you/${result.driver.id}`
+          );
+        }
+      } else  {
         toast("Submission Failed", {
           description:
             "An error occurred while submitting your application. Please try again.",

@@ -1,12 +1,23 @@
-import { DriverForm } from "@/components/DriverForm";
+import { Hero } from '@/components/sections/hero';
+import { Solution } from '@/components/sections/solution';
+// import { SocialProof } from '@/components/sections/social-proof';
+import { Features } from '@/components/sections/features';
+import { CallToAction } from '@/components/sections/call-to-action';
+import { FAQ } from '@/components/sections/faq';
+import { Header } from '@/components/header';
+import { Problem } from '@/components/sections/problem';
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full">
-        Hello world
-        <DriverForm mode="CREATE" />
-      </main>
-    </div>
+    <main className="flex min-h-screen flex-col">
+      <Header />
+      <Hero />
+      <Problem />
+      <Solution />
+      {/* <SocialProof /> */}
+      <Features />
+      <CallToAction />
+      <FAQ />
+    </main>
   );
 }

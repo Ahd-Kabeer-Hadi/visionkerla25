@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import {
   Driver,
   DriverFilterSchema,
@@ -9,7 +9,7 @@ import {
 } from "@/lib/validation/driver";
 import { z } from "zod";
 
-const prisma = new PrismaClient();
+const db = prisma;
 
 // Helper function to format error responses
 function formatError(error: unknown) {
@@ -28,7 +28,7 @@ export async function submitDriver(data: z.infer<typeof DriverSchema>) {
     const parsedData = DriverSchema.parse(data);
 
     // Check for existing driver in the same panchayat
-    const existingDriver = await prisma.driver.findFirst({
+    const existingDriver = await db.driver.findFirst({
       where: { panchayat: parsedData.panchayat },
     });
 
@@ -41,7 +41,7 @@ export async function submitDriver(data: z.infer<typeof DriverSchema>) {
     }
 
     // Create a new driver record
-    const newDriver = await prisma.driver.create({
+    const newDriver = await db.driver.create({
       data: {
         ...parsedData,
         status: "REVIEWING", // Default status for new drivers
@@ -64,7 +64,7 @@ export async function getDriverById(
   { success: true; driver: Driver } | { success: false; error: string }
 > {
   try {
-    const driver = await prisma.driver.findFirst({
+    const driver = await db.driver.findFirst({
       where: { id },
     });
 
@@ -84,7 +84,7 @@ export async function getDriverById(
 // List all drivers
 export async function listAllDrivers() {
   try {
-    const drivers = await prisma.driver.findMany();
+    const drivers = await db.driver.findMany();
     return { success: true, drivers };
   } catch (error: unknown) {
     return formatError(error);
@@ -129,7 +129,7 @@ export async function filterDrivers(
       };
     }
 
-    const drivers = await prisma.driver.findMany({ where: whereClause });
+    const drivers = await db.driver.findMany({ where: whereClause });
     return { success: true, drivers };
   } catch (error: unknown) {
     return formatError(error);
@@ -144,7 +144,7 @@ export async function updateDriver(
   try {
     const parsedData = DriverSchema.parse(data);
 
-    const updatedDriver = await prisma.driver.update({
+    const updatedDriver = await db.driver.update({
       where: { id },
       data: parsedData,
     });
@@ -158,7 +158,7 @@ export async function updateDriver(
 // Delete a driver by ID
 export async function deleteDriver(id: string) {
   try {
-    await prisma.driver.delete({
+    await db.driver.delete({
       where: { id },
     });
 

@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export function Hero() {
   return (
-    <section className="min-h-screen flex items-center justify-center pt-32 pb-20 bg-gray-50">
+    <section className="min-h-screen flex items-center justify-center max-w-7xl mx-auto px-4  pt-32 pb-20 bg-gray-50">
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -45,7 +45,7 @@ export function Features() {
   });
 
   return (
-    <section id="features" className="py-24 bg-gray-50">
+    <section id="features" className="py-24 bg-gray-50 max-w-7xl mx-auto px-4">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <motion.div

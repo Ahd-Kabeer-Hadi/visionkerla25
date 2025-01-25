@@ -72,9 +72,9 @@ export function FAQ() {
   });
 
   return (
-    <section id="faq" className="py-24 bg-gray-50">
+    <section id="faq" className="py-24 bg-gray-50 max-w-7xl mx-auto px-4">
       <div className="container mx-auto px-6 lg:px-12">
-      <motion.div
+        <motion.div
           ref={ref}
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -85,13 +85,15 @@ export function FAQ() {
             The FAQ
           </p>
           <h2 className="text-4xl font-extrabold text-gray-800 text-center mb-10">
-            Common Questions About{" "}
-
-            <h2 className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400">Mission Kerala 2025</h2>
+            Common Questions About{" "} <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400">
+            Mission Kerala 2025
+          </span>
           </h2>
+          
           <p className="text-lg text-gray-600 text-center mb-8">
-            Have questions? We&apos;ve got answers! Here&apos;s everything you need to
-            know about our initiative.
+            Have questions? We&apos;ve got answers! Here&apos;s everything you
+            need to know about our initiative.
           </p>
 
           <Accordion type="single" collapsible className="w-full space-y-4">

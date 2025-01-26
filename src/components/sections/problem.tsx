@@ -53,7 +53,7 @@ export function Problem() {
               Distribution System
             
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-balance text-gray-600 leading-relaxed max-w-2xl mx-auto">
             Identifying key obstacles that hinder supply chain efficiency and limit growth.
           </p>
         </motion.div>

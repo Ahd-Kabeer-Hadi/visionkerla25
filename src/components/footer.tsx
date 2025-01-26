@@ -23,7 +23,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="#"
+                  href="/privacy"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Privacy Policy
@@ -31,7 +31,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/terms-and-conditions"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Terms & Conditions
@@ -39,7 +39,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="tell:9447772868"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Contact Us

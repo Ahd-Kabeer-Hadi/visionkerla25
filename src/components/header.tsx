@@ -17,7 +17,7 @@ export function Header() {
         {/* Logo */}
         <Link
           href="/"
-          className="font-bold text-3xl text-black hover:text-gray-800 transition-colors"
+          className="font-bold text-3xl text-transparent bg-clip-text bg-gradient-to-r from-lime-500 to-cyan-400 transition-colors"
         >
           MK25
         </Link>

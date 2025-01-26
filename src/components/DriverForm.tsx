@@ -33,12 +33,14 @@ import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
 import { Checkbox } from "./ui/checkbox";
 import { redirect, useRouter } from "next/navigation";
+import TermsAndConditions from "./tnc";
 
 interface DriverFormProps {
   mode: "CREATE" | "UPDATE";
@@ -144,7 +146,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
             `/become-a-delivery-partner/thank-you/${result.driver.id}`
           );
         }
-      } else  {
+      } else {
         toast("Submission Failed", {
           description:
             "An error occurred while submitting your application. Please try again.",
@@ -434,12 +436,10 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
             <DialogHeader>
               <DialogTitle>Terms and Conditions</DialogTitle>
             </DialogHeader>
-            <p>
-              Here are the terms and conditions for registering as a delivery
-              partner. By accepting, you agree to comply with the stated rules
-              and regulations.
-              {/* Add your terms content here */}
-            </p>
+            <DialogDescription>
+              Please read and accept the terms and conditions.
+            </DialogDescription>
+            <TermsAndConditions showCommitment={true} />
             <DialogFooter>
               <Button
                 onClick={() => {

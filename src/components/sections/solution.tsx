@@ -51,7 +51,7 @@ export function Solution() {
             A Unified, <span className="text-gradient">Technology-Driven</span>{" "}
             Ecosystem
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto mt-4">
+          <p className="text-lg md:text-xl text-balance text-gray-600 leading-relaxed max-w-3xl mx-auto mt-4">
             Addressing Kerala&apos;s distribution challenges with an innovative,
             scalable approach that integrates technology and empowers local
             communities.

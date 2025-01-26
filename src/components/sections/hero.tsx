@@ -43,7 +43,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="text-lg md:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto mb-8"
+            className="text-lg md:text-xl text-balance text-gray-700 leading-relaxed max-w-3xl mx-auto mb-8"
           >
             Mission Kerala 2025 by NTouch Syndicate LLP: A groundbreaking
             initiative transforming distribution with cutting-edge technology

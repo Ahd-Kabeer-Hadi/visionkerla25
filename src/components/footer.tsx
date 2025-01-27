@@ -39,7 +39,8 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="tell:9447772868"
+                  href="https://wa.link/c2jcpt"
+                  target="_blank="
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Contact Us

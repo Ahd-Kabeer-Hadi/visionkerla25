@@ -11,7 +11,7 @@ export function Header() {
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="fixed top-0 left-0 w-full ] right-0 z-50 bg-white/90 backdrop-blur-lg border-b shadow-sm"
+      className="fixed top-0 left-0 w-full ] right-0 z-50 /90 backdrop-blur-lg border-b shadow-sm"
     >
       <div className="max-w-7xl mx-auto px-4 h-24 flex items-center justify-between">
         {/* Logo */}

@@ -20,7 +20,11 @@ import {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { submitDriver, updateDriver } from "@/app/actions/driverActions";
+import {
+  getDriverById,
+  submitDriver,
+  updateDriver,
+} from "@/app/actions/driverActions";
 import { Districts } from "@/lib/keralaDistricts";
 import {
   Select,
@@ -51,6 +55,12 @@ interface DriverFormProps {
 type DistrictMap = Record<string, string[]>;
 
 export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
+  if (mode === "UPDATE" && !userId) {
+    toast("Missing User ID", {
+      description:
+        "User ID is required to update the driver details. Please try again. If this issue persists, please contact support.",
+    });
+  }
   const form = useForm<z.infer<typeof DriverSchema>>({
     resolver: zodResolver(DriverSchema),
     defaultValues: {
@@ -68,6 +78,29 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
       status: "REVIEWING",
     },
   });
+
+  // Fetch driver data when in UPDATE mode
+  useEffect(() => {
+    if (mode === "UPDATE" && userId) {
+      const fetchDriver = async () => {
+        try {
+          const response = await getDriverById(userId);
+          if (!response.success) {
+            toast("Error", {
+              description: response.error || "Failed to fetch driver details.",
+            });
+          } else {
+            form.reset(response.driver); // Update form with fetched data
+          }
+        } catch (error) {
+          toast("Oops! Something went wrong", {
+            description: "Couldn't retrieve user details.",
+          });
+        }
+      };
+      fetchDriver();
+    }
+  }, [mode, userId, form]);
 
   const router = useRouter();
   const [panchayatOptions, setPanchayatOptions] = useState<string[]>([]);
@@ -167,6 +200,29 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 w-full mx-auto"
       >
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Change Status</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value || ""}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Change the status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value={"ACCEPTED"}>Accept</SelectItem>
+                  <SelectItem value={"REJECTED"}>Reject</SelectItem>
+                  <SelectItem value={"REVIEWING"}>Keep in Review</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Full Name */}
         <FormField
           control={form.control}
@@ -175,7 +231,11 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
             <FormItem>
               <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter full name" {...field} />
+                <Input
+                  placeholder="Enter full name"
+                  {...field}
+                  value={mode === "UPDATE" ? form.getValues("name") : ""}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -403,32 +463,34 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
         />
 
         {/* Terms and Conditions */}
-        <FormField
-          control={form.control}
-          name="tncAccepted"
-          render={({ field }) => {
-            const { value, ...fieldWithoutValue } = field; // Destructure to exclude 'value'
-            return (
-              <FormItem onClick={() => setShowTermsDialog(true)}>
-                <FormLabel>
-                  <div className="flex items-center gap-2">
-                    {/* Checkbox */}
-                    <Checkbox
-                      {...fieldWithoutValue} // Spread remaining field props
-                      checked={value} // Use 'value' for controlled state
-                      onCheckedChange={(checked) => {
-                        field.onChange(checked); // Update form field
-                        if (!checked) setShowTermsDialog(true); // Show dialog when unchecked
-                      }}
-                    />
-                    I agree to the Terms and Conditions
-                  </div>
-                </FormLabel>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
-        />
+        {mode === "CREATE" && (
+          <FormField
+            control={form.control}
+            name="tncAccepted"
+            render={({ field }) => {
+              const { value, ...fieldWithoutValue } = field; // Destructure to exclude 'value'
+              return (
+                <FormItem onClick={() => setShowTermsDialog(true)}>
+                  <FormLabel>
+                    <div className="flex items-center gap-2">
+                      {/* Checkbox */}
+                      <Checkbox
+                        {...fieldWithoutValue} // Spread remaining field props
+                        checked={value} // Use 'value' for controlled state
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked); // Update form field
+                          if (!checked) setShowTermsDialog(true); // Show dialog when unchecked
+                        }}
+                      />
+                      I agree to the Terms and Conditions
+                    </div>
+                  </FormLabel>
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
+          />
+        )}
 
         {/* Terms Dialog */}
         <Dialog open={showTermsDialog} onOpenChange={setShowTermsDialog}>

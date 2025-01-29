@@ -85,12 +85,12 @@ export function FAQ() {
             The FAQ
           </p>
           <h2 className="text-4xl font-extrabold text-gray-800 text-center mb-10">
-            Common Questions About{" "} <br />
+            Common Questions About <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400">
-            Mission Kerala 2025
-          </span>
+              Mission Kerala 2025
+            </span>
           </h2>
-          
+
           <p className="text-lg text-gray-600 text-center mb-8">
             Have questions? We&apos;ve got answers! Here&apos;s everything you
             need to know about our initiative.
@@ -103,7 +103,7 @@ export function FAQ() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="rounded-lg shadow-md border border-gray-200  bg-white overflow-hidden"
+                className="rounded-lg shadow-md border border-gray-200   overflow-hidden"
               >
                 <AccordionItem value={`item-${index}`} className="">
                   <AccordionTrigger className="text-left px-6 py-4 text-lg font-medium text-gray-800 hover:bg-gray-100">

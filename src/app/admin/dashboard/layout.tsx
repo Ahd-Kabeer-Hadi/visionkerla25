@@ -22,10 +22,9 @@ export default function Page({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      <html lang="en" suppressHydrationWarning>
-        <head />
-        <body>
+    
+     
+        <>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -59,8 +58,7 @@ export default function Page({
               </SidebarInset>
             </SidebarProvider>
           </ThemeProvider>
-        </body>
-      </html>
-    </>
+        </>
+     
   );
 }

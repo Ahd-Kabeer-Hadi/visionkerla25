@@ -43,7 +43,6 @@ export function DriverList() {
         const response = await listAllDrivers(page, pageSize);
         if (response.success) {
           setDrivers(response.drivers);
-          console.log(response.drivers);
           setTotal(response.total);
         } else {
           throw new Error(response.message);

@@ -81,6 +81,7 @@ export default function ManageDriver() {
         console.error("Failed to update driver status:", response.errors);
         toast("Error", {
           description: response.errors
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ? response.errors.map((error: { message: any; }) => error.message).join(", ")
             : "Failed to update driver status.",
         });

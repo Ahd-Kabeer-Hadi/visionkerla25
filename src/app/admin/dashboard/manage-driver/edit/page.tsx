@@ -10,6 +10,14 @@ import { useSearchParams } from "next/navigation";
 import DriverForm from "@/components/DriverForm";
 
 export default function EditDriver() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <InnerEditDriver />
+    </Suspense>
+  );
+}
+
+ function InnerEditDriver() {
   const searchParams = useSearchParams();
   const driverId = searchParams.get("driverId");
 

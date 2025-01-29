@@ -7,7 +7,7 @@ import {
   DriverFilterSchema,
   DriverSchema,
 } from "@/lib/validation/driver";
-import { z } from "zod";
+import { z, ZodIssue } from "zod";
 
 const db = prisma;
 
@@ -82,12 +82,28 @@ export async function getDriverById(
 }
 
 // List all drivers
-export async function listAllDrivers() {
+export async function listAllDrivers(
+  page: number = 1, // Default to page 1
+  pageSize: number = 20 // Default to 20 drivers per page
+): Promise<
+  | { success: true; drivers: Driver[]; total: number; page: number; pageSize: number }
+  | { success: false; message: string; errors?: ZodIssue[] }
+> {
   try {
-    const drivers = await db.driver.findMany();
-    return { success: true, drivers };
-  } catch (error: unknown) {
-    return formatError(error);
+    const skip = (page - 1) * pageSize; // Calculate offset
+    const drivers = await db.driver.findMany({
+      skip,
+      take: pageSize,
+      orderBy: { createdAt: "desc" }, // Order by latest created drivers
+    });
+
+    // Get total driver count for pagination info
+    const total = await db.driver.count();
+
+    return { success: true, drivers, total, page, pageSize };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return { success: false, message: "Failed to fetch drivers", errors: [] };
   }
 }
 
@@ -137,10 +153,10 @@ export async function filterDrivers(
 }
 
 // Update a driver by ID
-export async function updateDriver(
-  id: string,
-  data: z.infer<typeof DriverSchema>
-) {
+export async function updateDriver(id: string, data: z.infer<typeof DriverSchema>): Promise<
+  | { success: true; driver: Driver, errors:null}
+  | { success: false; message: string; errors?: any }
+> {
   try {
     const parsedData = DriverSchema.parse(data);
 
@@ -149,9 +165,13 @@ export async function updateDriver(
       data: parsedData,
     });
 
-    return { success: true, driver: updatedDriver };
-  } catch (error: unknown) {
-    return formatError(error);
+    return { success: true, driver: updatedDriver, errors: null };
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false, errors: error.errors, message: "Validation failed" };
+    }
+
+    return { success: false, errors: null, message: "An unexpected error occurred" };
   }
 }
 

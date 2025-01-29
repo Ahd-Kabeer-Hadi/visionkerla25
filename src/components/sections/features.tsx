@@ -1,40 +1,44 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
-import { Button } from '@/components/ui/button';
-import { Zap, MapPin, PiggyBank, Users, Eye, Globe } from 'lucide-react';
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { Button } from "@/components/ui/button";
+import { Zap, MapPin, PiggyBank, Users, Eye, Globe } from "lucide-react";
 
 const features = [
   {
     icon: Zap,
-    title: 'Efficiency',
-    description: 'Swift operations ensure timely deliveries and minimal delays.',
+    title: "Efficiency",
+    description:
+      "Swift operations ensure timely deliveries and minimal delays.",
   },
   {
     icon: PiggyBank,
-    title: 'Affordability',
-    description: 'Optimized processes reduce costs, passing savings to customers.',
+    title: "Affordability",
+    description:
+      "Optimized processes reduce costs, passing savings to customers.",
   },
   {
     icon: MapPin,
-    title: 'Reach',
-    description: 'Extend services to every corner of Kerala, including hard-to-reach areas.',
+    title: "Reach",
+    description:
+      "Extend services to every corner of Kerala, including hard-to-reach areas.",
   },
   {
     icon: Users,
-    title: 'Empowerment',
-    description: 'Foster growth by creating opportunities for local entrepreneurs.',
+    title: "Empowerment",
+    description:
+      "Foster growth by creating opportunities for local entrepreneurs.",
   },
   {
     icon: Eye,
-    title: 'Transparency',
-    description: 'Track every order with clear, real-time updates.',
+    title: "Transparency",
+    description: "Track every order with clear, real-time updates.",
   },
   {
     icon: Globe,
-    title: 'Sustainability',
-    description: 'Promote eco-friendly practices for a greener Kerala.',
+    title: "Sustainability",
+    description: "Promote eco-friendly practices for a greener Kerala.",
   },
 ];
 
@@ -62,7 +66,8 @@ export function Features() {
             Why Mission Kerala 2025 Leads the Way
           </h2>
           <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
-            Explore the unique features that make our initiative stand out in transforming Kerala&apos;s distribution landscape.
+            Explore the unique features that make our initiative stand out in
+            transforming Kerala&apos;s distribution landscape.
           </p>
         </motion.div>
 
@@ -74,16 +79,20 @@ export function Features() {
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow border border-gray-200 hover:border-gray-300 text-center"
+              className=" p-6 rounded-2xl shadow-md hover:shadow-lg transition-shadow border border-gray-200 hover:border-gray-300 text-center"
             >
               {/* Icon */}
               <div className="bg-blue-50 p-4 rounded-xl w-fit mx-auto mb-5">
                 <feature.icon className="h-8 w-8 text-blue-600" />
               </div>
               {/* Title */}
-              <h3 className="text-xl font-bold text-gray-800 mb-3">{feature.title}</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-3">
+                {feature.title}
+              </h3>
               {/* Description */}
-              <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+              <p className="text-gray-600 leading-relaxed">
+                {feature.description}
+              </p>
             </motion.div>
           ))}
         </div>

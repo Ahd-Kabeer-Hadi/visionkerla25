@@ -5,6 +5,7 @@ export const DriverStatusEnum = z.enum(["REVIEWING", "ACCEPTED", "REJECTED"]);
 
 // Driver Schema
 export const DriverSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, { message: "Name is required" }),
   email: z.string().email({ message: "Invalid email format" }),
   phoneNumber: z

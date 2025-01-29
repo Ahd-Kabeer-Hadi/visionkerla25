@@ -37,7 +37,7 @@ export function CallToAction() {
             <Button
               size="lg"
               variant="outline"
-              className="group bg-white text-black hover:bg-gray-100 flex items-center justify-center mx-auto"
+              className="group  text-black hover:bg-gray-100 flex items-center justify-center mx-auto"
             >
               Get Started Today
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />

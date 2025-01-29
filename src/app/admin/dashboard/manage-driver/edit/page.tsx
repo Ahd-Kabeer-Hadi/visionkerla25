@@ -46,7 +46,7 @@ export default function EditDriver() {
   }, [driverId]);
 
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
       <main className="flex w-full mx-auto min-h-screen flex-col items-centerbg-gray-50 py-8">
         <div className=" shadow-lg rounded-lg p-6 mx-auto w-full">
           {loading ? (

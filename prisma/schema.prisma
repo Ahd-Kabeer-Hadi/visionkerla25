@@ -13,14 +13,18 @@ model Driver {
   name                 String
   email                String       @unique
   phoneNumber          String       @unique
+  photourl             String
   emergencyContact     String
   emergencyContactName String
   address              String
   district             String
   panchayat            String       @unique
   aadhaarCardNumber    String
+  aadharCardUrl        String
   driversLicenseNumber String
+  driverLicenseUrl     String
   rcNumber             String
+  rcUrl                String
   tncAccepted          Boolean
   status               DriverStatus
   createdAt            DateTime     @default(now())

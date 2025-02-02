@@ -22,14 +22,19 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-import { Driver } from "@/lib/validation/driver";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "./ui/badge";
 import { useRouter } from "next/navigation";
+import { DriverServer } from "@/lib/validation/driverServer";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export function DriverList() {
-  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [drivers, setDrivers] = useState<DriverServer[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -57,10 +62,18 @@ export function DriverList() {
     fetchDrivers();
   }, [page]);
 
-  const handleViewDriver = (driverId: Driver["id"]) => {
+  const handleViewDriver = (driverId: DriverServer["id"]) => {
     // Correctly types driverId
     if (driverId) {
       Router.push(`/admin/dashboard/manage-driver?driverId=${driverId}`);
+    } else {
+      console.error("Driver ID is missing!");
+    }
+  };
+  const handleEditDriver = (driverId: DriverServer["id"]) => {
+    // Correctly types driverId
+    if (driverId) {
+      Router.push(`/admin/dashboard/manage-driver/edit?driverId=${driverId}`);
     } else {
       console.error("Driver ID is missing!");
     }
@@ -123,14 +136,23 @@ export function DriverList() {
                     <TableCell>{driver.panchayat}</TableCell>
                     <TableCell>{driver.district}</TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="font-medium text-ellipsis rounded-lg outline-sidebar-primary shadow-sm"
-                        onClick={() => handleViewDriver(driver.id)}
-                      >
-                        View Details
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>Actions</DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                         
+                          <DropdownMenuItem
+                            onClick={() => handleViewDriver(driver.id)}
+                          >
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem  onClick={() => handleEditDriver(driver.id)}>
+                           
+                              Edit Details
+                            
+                          </DropdownMenuItem>
+                          
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}

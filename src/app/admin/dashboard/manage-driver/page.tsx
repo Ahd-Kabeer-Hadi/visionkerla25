@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import { getDriverById, updateDriver } from "@/app/actions/driverActions";
 import DriverDetailsCard from "@/components/DriverDetailsCard";
-import { Driver } from "@/lib/validation/driver";
 import { XCircleIcon, Loader2Icon } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { DriverServer } from "@/lib/validation/driverServer";
 
 export default function ManageDriver() {
   return (
@@ -26,7 +27,7 @@ export default function ManageDriver() {
 function InnerManageDriver() {
   const searchParams = useSearchParams();
   const driverId = searchParams.get("driverId");
-  const [driver, setDriver] = useState<Driver | null>(null);
+  const [driver, setDriver] = useState<DriverServer | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [updating, setUpdating] = useState<boolean>(false);
@@ -81,10 +82,11 @@ function InnerManageDriver() {
           description: `Driver status updated to ${status}.`,
         });
       } else {
+        // @ts-ignore
         console.error("Failed to update driver status:", response.errors);
         toast("Error", {
-          description: response.errors
-            ? response.errors
+          // @ts-ignore
+          description: response.errors? response.errors
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .map((error: { message: any }) => error.message)
                 .join(", ")
@@ -99,7 +101,7 @@ function InnerManageDriver() {
     }
   };
 
-  const handleEditDriver = (driverId: Driver["id"]) => {
+  const handleEditDriver = (driverId: DriverServer["id"]) => {
     // Correctly types driverId
     if (driverId) {
       Router.push(`/admin/dashboard/manage-driver/edit?driverId=${driverId}`);

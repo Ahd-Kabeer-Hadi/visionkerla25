@@ -1,12 +1,14 @@
+// app/components/DriverForm.tsx
+
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable */
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DriverSchema } from "@/lib/validation/driver";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 import {
   Form,
@@ -45,6 +47,9 @@ import {
 import { Checkbox } from "./ui/checkbox";
 import { redirect, useRouter } from "next/navigation";
 import TermsAndConditions from "./tnc";
+import { deleteFromS3, uploadToS3 } from "@/lib/s3";
+import { DriverClientSchema } from "@/lib/validation/driverClient";
+import sanitizeImageUrl from "@/lib/imageSanitizer";
 
 interface DriverFormProps {
   mode: "CREATE" | "UPDATE";
@@ -61,8 +66,9 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
         "User ID is required to update the driver details. Please try again. If this issue persists, please contact support.",
     });
   }
-  const form = useForm<z.infer<typeof DriverSchema>>({
-    resolver: zodResolver(DriverSchema),
+
+  const form = useForm<z.infer<typeof DriverClientSchema>>({
+    resolver: zodResolver(DriverClientSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -72,6 +78,10 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
       address: "",
       district: "",
       panchayat: "",
+      aadharCardUrl: "",
+      driverLicenseUrl: "",
+      rcUrl: "",
+      photourl: "",
       aadhaarCardNumber: "",
       driversLicenseNumber: "",
       rcNumber: "",
@@ -103,6 +113,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
   }, [mode, userId, form]);
 
   const router = useRouter();
+  const [uploading, setUploading] = useState(false);
   const [panchayatOptions, setPanchayatOptions] = useState<string[]>([]);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -130,8 +141,59 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch("district")]);
 
-  const onSubmit = async (data: z.infer<typeof DriverSchema>) => {
+  const handleFileUpload = async (
+    currentUrl: string,
+    newFile: File | string,
+    fieldName: string
+  ) => {
+    if (newFile instanceof File) {
+      if (currentUrl) await deleteFromS3(currentUrl);
+      const data = form.getValues();
+      const folderPath = `Kerala/${data.district}/${
+        data.panchayat
+      }/${data.name.replace(/ /g, "_")}`;
+      const key = `${folderPath}/${fieldName}/${newFile.name}_${Date.now()}.${
+        newFile.type.split("/")[1]
+      }`;
+      return uploadToS3(newFile, key);
+    }
+    return currentUrl as string;
+  };
+
+  const onSubmit = async (data: z.infer<typeof DriverClientSchema>) => {
     try {
+      setUploading(true);
+
+      const aadharCardUrlValue = form.getValues("aadharCardUrl");
+      const aadharCard =
+        typeof aadharCardUrlValue === "string" ? aadharCardUrlValue : "";
+      const driverLicenseUrlValue = form.getValues("driverLicenseUrl");
+      const driverLicense =
+        typeof driverLicenseUrlValue === "string" ? driverLicenseUrlValue : "";
+      const rcUrlValue = form.getValues("rcUrl");
+      const rc = typeof rcUrlValue === "string" ? rcUrlValue : "";
+      const photoUrlValue = form.getValues("photourl");
+      const photo = typeof photoUrlValue === "string" ? photoUrlValue : "";
+
+      const uploadPromises = [
+        handleFileUpload(aadharCard, data.aadharCardUrl, "aadharCard"),
+        handleFileUpload(driverLicense, data.driverLicenseUrl, "driverLicense"),
+        handleFileUpload(rc, data.rcUrl, "rc"),
+        handleFileUpload(photo, data.photourl, "photo"),
+      ];
+
+      const [aadharCardUrl, driverLicenseUrl, rcUrl, photourl] =
+        await Promise.all(uploadPromises);
+
+      // Prepare final data for server submission (using URL strings)
+      const finalData = {
+        ...data,
+        aadharCardUrl: aadharCardUrl,
+        driverLicenseUrl: driverLicenseUrl,
+        rcUrl: rcUrl,
+        photourl: photourl,
+      };
+
       if (mode === "UPDATE") {
         if (!userId) {
           toast("Missing User ID", {
@@ -141,7 +203,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
           return;
         }
 
-        const result = await updateDriver(userId, data);
+        const result = await updateDriver(userId, finalData);
         result;
 
         if (result.success) {
@@ -166,7 +228,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
       }
 
       // Handle "CREATE" mode
-      const result = await submitDriver(data);
+      const result = await submitDriver(finalData);
 
       if (result.success) {
         toast("Submission Successful", {
@@ -193,36 +255,65 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
       console.error("Error in onSubmit:", error);
     }
   };
+ 
 
+  // File input component with preview
+  const FileInputWithPreview = ({ field }: { field: any }) => (
+    <div className="space-y-2">
+      <Input
+        type="file"
+        accept="image/jpeg,image/png"
+        onChange={(e) => field.onChange(e.target.files?.[0])}
+      />
+      {field.value && (
+        <div className="relative h-48 w-48">
+          <Image
+            src={
+              field.value instanceof File
+                ? URL.createObjectURL(field.value)
+                : sanitizeImageUrl(field.value)
+            }
+            alt="Preview"
+            fill
+            className="object-contain border rounded-md"
+          />
+        </div>
+      )}
+    </div>
+  );
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 w-full mx-auto"
       >
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Change Status</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value || ""}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Change the status" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value={"ACCEPTED"}>Accept</SelectItem>
-                  <SelectItem value={"REJECTED"}>Reject</SelectItem>
-                  <SelectItem value={"REVIEWING"}>Keep in Review</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+        {mode === "UPDATE" && (
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Change Status</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Change the status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={"ACCEPTED"}>Accept</SelectItem>
+                    <SelectItem value={"REJECTED"}>Reject</SelectItem>
+                    <SelectItem value={"REVIEWING"}>Keep in Review</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         {/* Full Name */}
         <FormField
           control={form.control}
@@ -279,6 +370,23 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
             </FormItem>
           )}
         />
+        {/* Aadhar Card */}
+
+        {/* Photo */}
+        <FormField
+          control={form.control}
+          name="photourl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Photo</FormLabel>
+              <FormControl>
+                <FileInputWithPreview field={field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Emergency Contact Number */}
         <FormField
           control={form.control}
@@ -419,6 +527,19 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="aadharCardUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Aadhaar Card</FormLabel>
+              <FormControl>
+                <FileInputWithPreview field={field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
@@ -440,6 +561,20 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
             </FormItem>
           )}
         />
+        {/* Driver License */}
+        <FormField
+          control={form.control}
+          name="driverLicenseUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Driver's License</FormLabel>
+              <FormControl>
+                <FileInputWithPreview field={field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
@@ -456,6 +591,20 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
                   placeholder="Enter your vehicle's RC number"
                   {...field}
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* RC Document */}
+        <FormField
+          control={form.control}
+          name="rcUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>RC Document</FormLabel>
+              <FormControl>
+                <FileInputWithPreview field={field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -516,9 +665,12 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
         </Dialog>
 
         {/* Submit Button */}
-        <Button type="submit" className="w-full">
+
+        <Button type="submit" className="w-full" disabled={uploading}>
           {mode === "CREATE"
-            ? "Submit Registration"
+            ? uploading
+              ? "Processing..."
+              : "Submit Registration"
             : "Update Delivery Partner Details"}
         </Button>
       </form>

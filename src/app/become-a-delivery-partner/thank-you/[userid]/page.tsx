@@ -3,15 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getDriverById } from "@/app/actions/driverActions";
-import { Driver } from "@/lib/validation/driver";
 import DriverDetailsCard from "@/components/DriverDetailsCard";
 import { CheckCircleIcon, XCircleIcon } from "lucide-react";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
+import { DriverServer } from "@/lib/validation/driverServer";
 
 const ThankYouPage: React.FC = () => {
   const { userid } = useParams();
-  const [driver, setDriver] = useState<Driver | null>(null);
+  const [driver, setDriver] = useState<DriverServer | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 

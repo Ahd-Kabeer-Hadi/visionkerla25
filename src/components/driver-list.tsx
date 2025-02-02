@@ -22,14 +22,14 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-import { Driver } from "@/lib/validation/driver";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "./ui/badge";
 import { useRouter } from "next/navigation";
+import { DriverServer } from "@/lib/validation/driverServer";
 
 export function DriverList() {
-  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [drivers, setDrivers] = useState<DriverServer[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -57,7 +57,7 @@ export function DriverList() {
     fetchDrivers();
   }, [page]);
 
-  const handleViewDriver = (driverId: Driver["id"]) => {
+  const handleViewDriver = (driverId: DriverServer["id"]) => {
     // Correctly types driverId
     if (driverId) {
       Router.push(`/admin/dashboard/manage-driver?driverId=${driverId}`);

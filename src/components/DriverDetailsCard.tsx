@@ -1,11 +1,11 @@
 import React from "react";
-import { Driver } from "@/lib/validation/driver";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
+import { DriverServer } from "@/lib/validation/driverServer";
 
 interface DriverDetailsCardProps {
-  driver: Driver;
+  driver: DriverServer;
 }
 const DriverDetailsCard: React.FC<DriverDetailsCardProps> = ({ driver }) => {
   return (

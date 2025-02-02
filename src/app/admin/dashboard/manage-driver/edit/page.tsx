@@ -1,13 +1,13 @@
 "use client";
 
 import { getDriverById } from "@/app/actions/driverActions";
-import { Driver } from "@/lib/validation/driver";
 import { XCircleIcon, Loader2Icon } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 // import { ScrollArea } from "@/components/ui/scroll-area";
 
 import DriverForm from "@/components/DriverForm";
+import { DriverServer } from "@/lib/validation/driverServer";
 
 export default function EditDriver() {
   return (
@@ -21,7 +21,7 @@ export default function EditDriver() {
   const searchParams = useSearchParams();
   const driverId = searchParams.get("driverId");
 
-  const [driver, setDriver] = useState<Driver | null>(null);
+  const [driver, setDriver] = useState<DriverServer | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 

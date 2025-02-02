@@ -1,10 +1,55 @@
-// app/components/DriverForm.tsx
-
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable */
 "use client";
 
+
+export async function uploadFileAction({
+  formData,
+  fileField,
+}: {
+  formData: FormData;
+  fileField: string;
+}) {
+  try {
+    const file = formData.get(fileField) as File;
+
+    if (!file || !(file instanceof File)) {
+      return { success: false, error: "No file provided or wrong file type" };
+    }
+
+    // Get additional metadata if needed
+    const district = formData.get("district")?.toString() || "default";
+    const panchayat = formData.get("panchayat")?.toString() || "default";
+    const name = formData.get("name")?.toString() || "unknown";
+
+    // Generate an S3 key
+    const folderPath = `Kerala/${district}/${panchayat}/${name.replace(
+      / /g,
+      "_"
+    )}`;
+    const key = `${folderPath}/${file.name}_${Date.now()}.${
+      file.type.split("/")[1]
+    }`;
+
+    // Upload to S3
+    const uploadResult = await uploadToS3(file, key);
+
+    return {
+      success: true,
+      data: {
+        url: uploadResult,
+        fileName: file.name,
+        fileType: file.type,
+        size: file.size,
+      },
+    };
+  } catch (error) {
+    console.error("File upload error:", error);
+    return { success: false, error: "File upload failed" };
+  }
+}
 import { zodResolver } from "@hookform/resolvers/zod";
+import { DriverSchema, DriverServerSchema } from "@/lib/validation/driver";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
@@ -48,7 +93,6 @@ import { Checkbox } from "./ui/checkbox";
 import { redirect, useRouter } from "next/navigation";
 import TermsAndConditions from "./tnc";
 import { deleteFromS3, uploadToS3 } from "@/lib/s3";
-import { DriverClientSchema } from "@/lib/validation/driverClient";
 
 interface DriverFormProps {
   mode: "CREATE" | "UPDATE";
@@ -58,7 +102,7 @@ interface DriverFormProps {
 // Ensure correct typings for districts and panchayats
 type DistrictMap = Record<string, string[]>;
 
-export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
+export function UpdateDriverForm({ mode = "CREATE", userId }: DriverFormProps) {
   if (mode === "UPDATE" && !userId) {
     toast("Missing User ID", {
       description:
@@ -66,8 +110,10 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
     });
   }
 
-  const form = useForm<z.infer<typeof DriverClientSchema>>({
-    resolver: zodResolver(DriverClientSchema),
+  const form = useForm<
+    z.infer<typeof DriverSchema> | z.infer<typeof DriverServerSchema>
+  >({
+    resolver: zodResolver(DriverSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -146,7 +192,10 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
     fieldName: string
   ) => {
     if (newFile instanceof File) {
+      // Delete old file if exists
       if (currentUrl) await deleteFromS3(currentUrl);
+
+      // Upload new file
       const data = form.getValues();
       const folderPath = `Kerala/${data.district}/${
         data.panchayat
@@ -159,40 +208,46 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
     return currentUrl as string;
   };
 
-  const onSubmit = async (data: z.infer<typeof DriverClientSchema>) => {
+  const onSubmit = async (
+    data: z.infer<typeof DriverSchema> | z.infer<typeof DriverServerSchema>
+  ) => {
     try {
       setUploading(true);
 
+      // Handle file uploads/replacements
       const aadharCardUrlValue = form.getValues("aadharCardUrl");
-      const aadharCard =
-        typeof aadharCardUrlValue === "string" ? aadharCardUrlValue : "";
       const driverLicenseUrlValue = form.getValues("driverLicenseUrl");
-      const driverLicense =
-        typeof driverLicenseUrlValue === "string" ? driverLicenseUrlValue : "";
       const rcUrlValue = form.getValues("rcUrl");
-      const rc = typeof rcUrlValue === "string" ? rcUrlValue : "";
       const photoUrlValue = form.getValues("photourl");
-      const photo = typeof photoUrlValue === "string" ? photoUrlValue : "";
 
       const uploadPromises = [
-        handleFileUpload(aadharCard, data.aadharCardUrl, "aadharCard"),
-        handleFileUpload(driverLicense, data.driverLicenseUrl, "driverLicense"),
-        handleFileUpload(rc, data.rcUrl, "rc"),
-        handleFileUpload(photo, data.photourl, "photo"),
+        handleFileUpload(
+          aadharCardUrlValue,
+          data.aadharCardUrl,
+          "aadharCardUrl"
+        ),
+        handleFileUpload(
+          driverLicenseUrlValue,
+          data.driverLicenseUrl,
+          "driverLicenseUrl"
+        ),
+        handleFileUpload(rcUrlValue, data.rcUrl, "rcUrl"),
+        handleFileUpload(photoUrlValue, data.photourl, "photourl"),
       ];
 
-      const [aadharCardUrl, driverLicenseUrl, rcUrl, photourl] =
-        await Promise.all(uploadPromises);
+      const [aadharUrl, licenseUrl, rcUrl, photoUrl] = await Promise.all(
+        uploadPromises
+      );
 
-      // Prepare final data for server submission (using URL strings)
-      const finalData = {
+      const finalData: z.infer<typeof DriverServerSchema> = {
         ...data,
-        aadharCardUrl: aadharCardUrl,
-        driverLicenseUrl: driverLicenseUrl,
+        aadharCardUrl: aadharUrl,
+        driverLicenseUrl: licenseUrl,
         rcUrl: rcUrl,
-        photourl: photourl,
+        photourl: photoUrl,
       };
 
+      console.log("Final Data:", finalData);
       if (mode === "UPDATE") {
         if (!userId) {
           toast("Missing User ID", {
@@ -235,11 +290,11 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
             "Your application has been submitted successfully. We will review it shortly.",
         });
         form.reset();
-        if (result.success && "driver" in result && result.driver) {
-          router.push(
-            `/become-a-delivery-partner/thank-you/${result.driver.id}`
-          );
-        }
+        // if (result.success && "driver" in result && result.driver) {
+        //   router.push(
+        //     `/become-a-delivery-partner/thank-you/${result.driver.id}`
+        //   );
+        // }
       } else {
         toast("Submission Failed", {
           description:

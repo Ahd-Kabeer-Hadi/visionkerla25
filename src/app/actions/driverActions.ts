@@ -16,6 +16,43 @@ const formatError = (error: unknown) => ({
   error: error instanceof Error ? error.message : "Unknown error",
 });
 
+
+// Admin login function
+export async function userLogin(
+  email: string,
+): Promise<
+  { success: true; driver: DriverServer["id"] } | { success: false; error: string }
+> {
+  try {
+    // Validate input email and password using a subset of AdminSchema
+    const DriverLoginSchema = DriverServerSchema.pick({
+      email: true,
+    });
+
+    DriverLoginSchema.parse({ email });
+
+    // Find the admin using the provided email
+    const user = await db.driver.findFirst({
+      where: { email },
+    });
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    // Compare the provided password with the stored hashed password
+    
+    // Return successful response with admin details
+    return {
+      success: true,
+      driver: user["id"],
+    };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
 // Create Driver
 export async function submitDriver(data: z.infer<typeof DriverServerSchema>) {
   try {

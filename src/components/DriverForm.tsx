@@ -49,6 +49,7 @@ import { redirect, useRouter } from "next/navigation";
 import TermsAndConditions from "./tnc";
 import { deleteFromS3, uploadToS3 } from "@/lib/s3";
 import { DriverClientSchema } from "@/lib/validation/driverClient";
+import sanitizeImageUrl from "@/lib/imageSanitizer";
 
 interface DriverFormProps {
   mode: "CREATE" | "UPDATE";
@@ -254,6 +255,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
       console.error("Error in onSubmit:", error);
     }
   };
+ 
 
   // File input component with preview
   const FileInputWithPreview = ({ field }: { field: any }) => (
@@ -269,7 +271,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
             src={
               field.value instanceof File
                 ? URL.createObjectURL(field.value)
-                : field.value
+                : sanitizeImageUrl(field.value)
             }
             alt="Preview"
             fill

@@ -323,9 +323,9 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
               <FormLabel>Full Name</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Enter full name"
+                  placeholder="Enter full name" autoComplete="off"
                   {...field}
-                  value={mode === "UPDATE" ? form.getValues("name") : ""}
+                 
                 />
               </FormControl>
               <FormMessage />
@@ -342,7 +342,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
               <FormLabel>Email Address</FormLabel>
               <FormControl>
                 <Input
-                  type="email"
+                  type="email" autoComplete="off"
                   placeholder="Enter a valid email"
                   {...field}
                 />
@@ -361,7 +361,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
               <FormLabel>Phone </FormLabel>
               <FormControl>
                 <Input
-                  type="tel"
+                  type="tel" autoComplete="off"
                   placeholder="Enter your 10-digit phone number"
                   {...field}
                 />
@@ -401,7 +401,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
               </FormDescription>
               <FormControl>
                 <Input
-                  type="text"
+                  type="text" autoComplete="off"
                   placeholder="Enter a responsive and responsible person's contact number"
                   maxLength={10}
                   pattern="\d{10}" // Ensures only valid 10-digit phone numbers
@@ -424,7 +424,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
                 format:&quot;John Doe - Father&quot;..
               </FormDescription>
               <FormControl>
-                <Input placeholder="Enter Emergency Contact Name" {...field} />
+                <Input placeholder="Enter Emergency Contact Name" autoComplete="off" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -441,7 +441,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
               <FormControl>
                 <Textarea
                   placeholder="Enter your complete residential address"
-                  {...field}
+                  {...field} autoComplete="off"
                 />
               </FormControl>
               <FormMessage />
@@ -519,7 +519,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
               <FormControl>
                 <Input
                   type="text"
-                  placeholder="Enter your 12-digit Aadhaar number"
+                  placeholder="Enter your 12-digit Aadhaar number" autoComplete="off"
                   {...field}
                 />
               </FormControl>
@@ -553,7 +553,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
               <FormControl>
                 <Input
                   type="text"
-                  placeholder="Enter your driver's license number"
+                  placeholder="Enter your driver's license number" autoComplete="off"
                   {...field}
                 />
               </FormControl>
@@ -588,7 +588,7 @@ export function DriverForm({ mode = "CREATE", userId }: DriverFormProps) {
               <FormControl>
                 <Input
                   type="text"
-                  placeholder="Enter your vehicle's RC number"
+                  placeholder="Enter your vehicle's RC number" autoComplete="off"
                   {...field}
                 />
               </FormControl>
